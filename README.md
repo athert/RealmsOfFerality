@@ -29,14 +29,4 @@ World (No gameobject should be placed in this parent (doesnt count for hirearchy
 	-> _design
 	-> _graphics
 	-> ..
-	
-		Island of naked fish
-		-> _design
-		-> _graphics
-		-> ..
-		
-	Green Lands
-	-> _design
-	-> _graphics
-	-> ..
 ```
