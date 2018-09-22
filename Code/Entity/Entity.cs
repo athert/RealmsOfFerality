@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,19 @@ public class Entity : MonoBehaviour
     public void SetId(int id)
     {
         this.id = id;
+    }
+    public void SetPosition(Vector3 position)
+    {
+        transform.position = position;
+    }
+    public void SetOrientation(float orientation)
+    {
+        GetMovementModule().SetRequestRotation(orientation);
+        transform.eulerAngles = new Vector3(0, orientation, 0);
+    }
+    public void SetPostStartAction(Action postStartAction)
+    {
+        this.postStartAction = postStartAction;
     }
 
     public EntityAnimation GetAnimationModule()
@@ -56,6 +70,11 @@ public class Entity : MonoBehaviour
         visualModule = new EntityVisual(this);
 
         characterController = GetComponent<CharacterController>();
+
+        Game.OnCreatedEntity(this);
+
+        if (postStartAction != null)
+            postStartAction();
     }
 	protected virtual void Update ()
     {
@@ -81,5 +100,6 @@ public class Entity : MonoBehaviour
     private EntityInfo infoModule;
     private CharacterController characterController;
     private int id;
+    private Action postStartAction = null;
     #endregion
 }

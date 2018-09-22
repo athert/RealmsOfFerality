@@ -10,14 +10,18 @@ public class NetworkMessage
     {
         client_loginRequest,
         server_loginAnswer,
-
         server_requestMapLoading,
+
+        obstacle_mapRequested,
+
         server_createEntity,
+        server_setControllable,
         server_entity_setVisual,
         server_entity_setInventory,
         server_entity_setAnimation,
         server_removeEntity,
         server_movementUpdate,
+        client_positionUpdate,
     }
 
     public Type type;

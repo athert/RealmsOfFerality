@@ -10,7 +10,7 @@ public class Network : MonoBehaviour
     #region public
     public static void SendMessage(NetDataWriter data, SendOptions option)
     {
-        
+        instance.serverNetPeer.Send(data, option);
     }
     //call in fader after map loading
     public static void OnPostLoadReconstruction()
@@ -28,16 +28,51 @@ public class Network : MonoBehaviour
 
         for (int i = 0; i < instance.entityMessageWaitingList[entity.GetId()].Count; i++)
         {
-            NetworkMessage.Type messageType = (NetworkMessage.Type)instance.entityMessageWaitingList[entity.GetId()][i].GetByte();
-            Game.AddThreadAction(() => NetworkMessageResolve.Resolve(messageType, instance.entityMessageWaitingList[entity.GetId()][i]));
+            NetDataReader data = new NetDataReader();
+            data.SetSource(instance.entityMessageWaitingList[entity.GetId()][i].Data);
+
+            NetworkMessage.Type messageType = (NetworkMessage.Type)data.GetByte();
+            Game.AddThreadAction(() => NetworkMessageResolve.Resolve(messageType, data));
         }
+        instance.entityMessageWaitingList.Remove(entity.GetId());
     }
     public static void AddEntityWaitingMessage(int id, NetDataReader data)
     {
         if (!instance.entityMessageWaitingList.ContainsKey(id))
             instance.entityMessageWaitingList.Add(id, new List<NetDataReader>());
 
-        instance.entityMessageWaitingList[id].Add(data);
+        NetDataReader tempReader = new NetDataReader();
+        tempReader.SetSource(data.Data);
+        instance.entityMessageWaitingList[id].Add(tempReader);
+    }
+
+    public static void Connect()
+    {
+        Debug.Log("connecting...");
+
+        EventBasedNetListener listener = new EventBasedNetListener();
+        instance.serverConnection = new NetManager(listener, "rofConnection");
+        instance.serverConnection.UpdateTime = 10;
+        instance.serverConnection.Start();
+        instance.serverConnection.Connect("127.0.0.1", 5555);
+
+        listener.NetworkReceiveEvent += instance.OnNetworkReceiveEvent;
+        listener.PeerConnectedEvent += instance.OnPeerConnectedEvent;
+        listener.PeerDisconnectedEvent += instance.OnPeerDisconnectedEvent;
+        listener.NetworkLatencyUpdateEvent += instance.OnNetworkLatencyUpdateEvent;
+
+        instance.networkThread = new Thread(instance.NetworkThread);
+        instance.networkThread.Start();
+    }
+    public static void Disconnect()
+    {
+        instance.serverConnection.Stop();
+
+        instance.networkThread.Interrupt();
+        instance.networkThread = null;
+
+        instance.OnDisconnect();
+        Debug.Log("disconnecting...");
     }
     #endregion
 
@@ -70,71 +105,9 @@ public class Network : MonoBehaviour
             messageWaitingList.Add(new NetDataReader(data.Data));
         }
     }
-    private bool CanProcessMessage(NetworkMessage.Type type)
-    {
-        if (!Game.IsMapReady())
-        {
-            switch (type)
-            {
-                case NetworkMessage.Type.server_createEntity:
-                case NetworkMessage.Type.server_removeEntity:
-                    return false;
-            }
-        }
-        return true;
-    }
-    #endregion
-
-    
-    public void Connect()
-    {
-        EventBasedNetListener listener = new EventBasedNetListener();
-        serverConnection = new NetManager(listener, "feralHeartConnection");
-        serverConnection.UpdateTime = 10;
-        listener.NetworkReceiveEvent += OnNetworkReceiveEvent;
-        listener.PeerConnectedEvent += OnPeerConnectedEvent;
-        listener.PeerDisconnectedEvent += OnPeerDisconnectedEvent;
-        listener.NetworkLatencyUpdateEvent += OnNetworkLatencyUpdateEvent;
-
-        networkThread = new Thread(NetworkThread);
-        Debug.Log("connecting...");
-        serverConnection.Start();
-        serverConnection.Connect("127.0.0.1", 5555);
-        //serverConnection.Connect(Database.GetConfig().netAddress, Database.GetConfig().netPort);
-        networkThread.Start();
-    }
-
-    public void OnApplicationQuit()
-    {
-        serverConnection.Stop();
-        networkThread.Abort();
-
-        serverConnection = null;
-        networkThread = null;
-    }
-
     private void OnNetworkLatencyUpdateEvent(NetPeer peer, int latency)
     {
         //Game.serverLatency = latency;
-    }
-
-    public void Disconnect()
-    {
-        Debug.Log("disconnecting...");
-        serverConnection.Stop();
-        networkThread.Interrupt();
-        networkThread = null;
-
-        OnDisconnect();
-    }
-
-    private void NetworkThread()
-    {
-        while (true)
-        {
-            serverConnection.PollEvents();
-            Thread.Sleep(20);
-        }
     }
     private void OnPeerConnectedEvent(NetPeer peer)
     {
@@ -146,14 +119,40 @@ public class Network : MonoBehaviour
         Debug.Log("Disconnect from: " + peer.EndPoint);
         OnDisconnect();
     }
-
-    void OnConnect(NetPeer peer)
+    private void NetworkThread()
+    {
+        while (true)
+        {
+            serverConnection.PollEvents();
+            Thread.Sleep(20);
+        }
+    }
+    private void OnConnect(NetPeer peer)
     {
         serverNetPeer = peer;
     }
-    void OnDisconnect()
+    private void OnDisconnect()
     {
         serverNetPeer = null;
         Disconnect();
     }
+    private void OnApplicationQuit()
+    {
+        if (serverConnection != null)
+            serverConnection.Stop();
+        if (networkThread != null)
+            networkThread.Abort();
+
+        serverConnection = null;
+        networkThread = null;
+    }
+    private bool CanProcessMessage(NetworkMessage.Type type)
+    {
+        if (!Game.IsMapReady())
+        {
+            return (int)type <= (int)NetworkMessage.Type.obstacle_mapRequested;
+        }
+        return true;
+    }
+    #endregion
 }

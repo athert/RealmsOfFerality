@@ -2,15 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Database : MonoBehaviour {
+public class Database : MonoBehaviour
+{
+    public Transform debugEntity;
+    public Vector3 debugVector = new Vector3(50, 1, 50);
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    private void Start()
+    {
+        
+    }
+
+    public Entity CreateEntity()
+    {
+        Transform ent = Instantiate(debugEntity);
+        return ent.GetComponent<Entity>();
+    }
 }

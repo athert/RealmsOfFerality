@@ -7,9 +7,6 @@ using UnityEngine.SceneManagement;
 public class Game : MonoBehaviour
 {
     #region public
-    public Entity debugAttachableEntity;
-    public Entity debugAttachableEntity2;
-
     public int entityLayerIndex = 9;
 
     public static void AddThreadAction(Action action)
@@ -50,8 +47,6 @@ public class Game : MonoBehaviour
     private Map localMap;
     private List<Action> mainThreadActionList = new List<Action>();
 
-    private bool debugBool;
-
     private void OnEnable()
     {
         SceneManager.activeSceneChanged += PreLoadReconstruction;
@@ -66,11 +61,19 @@ public class Game : MonoBehaviour
     {
         Physics.IgnoreLayerCollision(entityLayerIndex, entityLayerIndex, true);
         //for debug only
-        PostLoadReconstruction(default(Scene), LoadSceneMode.Additive);
+        //PostLoadReconstruction(default(Scene), LoadSceneMode.Additive);
     }
 	private void Update ()
     {
-		if(Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Network.Connect();
+        }
+        if (Input.GetKeyDown(KeyCode.O))
+        {
+            NetworkMessageResolve.NetworkLoginRequest("a", "b");
+        }
+        /*if(Input.GetKeyDown(KeyCode.P))
         {
             if (debugBool)
                 localPlayer.ControllableEntity = debugAttachableEntity;
@@ -78,7 +81,7 @@ public class Game : MonoBehaviour
                 localPlayer.ControllableEntity = debugAttachableEntity2;
 
             debugBool = !debugBool;
-        }
+        }*/
 
         if (mainThreadActionList.Count > 0)
         {

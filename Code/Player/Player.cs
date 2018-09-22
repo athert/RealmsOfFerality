@@ -37,10 +37,10 @@ public class Player : MonoBehaviour
         if (controllableEntity == null)
             return;
 
-		if(Input.GetKeyDown(KeyCode.O))
+		/*if(Input.GetKeyDown(KeyCode.O))
         {
             controllableEntity.GetMovementModule().AddForce(Vector3.one, 3);
-        }
+        }*/
 
         Vector3 inputs = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));     
         float vertical = Input.GetKeyDown(KeyCode.Space) ? 1 : Input.GetKeyDown(KeyCode.LeftControl) ? -1 : 0;
