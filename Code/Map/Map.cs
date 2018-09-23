@@ -14,6 +14,11 @@ public class Map : MonoBehaviour
     {
         return entityList.Find(x => x.GetId() == id);
     }
+    public void RemoveEntity(int id)
+    {
+        Entity tempEntity = entityList.Find(x => x.GetId() == id);
+        DestroyImmediate(tempEntity.gameObject);
+    }
     #endregion
     #region private
     private List<Entity> entityList = new List<Entity>();

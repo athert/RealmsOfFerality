@@ -23,6 +23,10 @@ public class Entity : MonoBehaviour
     {
         this.postStartAction = postStartAction;
     }
+    public void DisableMovement(bool disable)
+    {
+        disableMovement = disable;
+    }
 
     public EntityAnimation GetAnimationModule()
     {
@@ -78,9 +82,12 @@ public class Entity : MonoBehaviour
     }
 	protected virtual void Update ()
     {
-        GetMovementModule().CalculateMovement();
-        transform.eulerAngles = movementModule.GetRotation();
-        characterController.Move(movementModule.GetMovementDirection()*Time.deltaTime);
+        if (!disableMovement)
+        {
+            GetMovementModule().CalculateMovement();
+            transform.eulerAngles = movementModule.GetRotation();
+            characterController.Move(movementModule.GetMovementDirection() * Time.deltaTime);
+        }
     }
     protected virtual void LateUpdate()
     {
@@ -101,5 +108,6 @@ public class Entity : MonoBehaviour
     private CharacterController characterController;
     private int id;
     private Action postStartAction = null;
+    private bool disableMovement;
     #endregion
 }

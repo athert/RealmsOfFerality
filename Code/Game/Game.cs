@@ -7,6 +7,10 @@ using UnityEngine.SceneManagement;
 public class Game : MonoBehaviour
 {
     #region public
+    public enum GameVersion
+    {
+        alpha_01a,
+    }
     public int entityLayerIndex = 9;
 
     public static void AddThreadAction(Action action)
@@ -24,6 +28,11 @@ public class Game : MonoBehaviour
         GetMap().OnCreatedEntity(entity);
         Network.OnCreatedEntity(entity);
     }
+    public static void LevelLoadRequest()
+    {
+        instance.PreLoadReconstruction();
+        SceneManager.LoadSceneAsync("SampleScene", LoadSceneMode.Single);
+    }
     public static Player GetPlayer()
     {
         if (instance == null)
@@ -39,6 +48,10 @@ public class Game : MonoBehaviour
     {
         return GetMap() != null;
     }
+    public static GameVersion GetGameVersion()
+    {
+        return instance.gameVersion;
+    }
     #endregion
 
     #region private
@@ -46,10 +59,10 @@ public class Game : MonoBehaviour
     private Player localPlayer;
     private Map localMap;
     private List<Action> mainThreadActionList = new List<Action>();
+    private GameVersion gameVersion = GameVersion.alpha_01a;
 
     private void OnEnable()
     {
-        SceneManager.activeSceneChanged += PreLoadReconstruction;
         SceneManager.sceneLoaded += PostLoadReconstruction;
     }
     private void Awake()
@@ -60,19 +73,12 @@ public class Game : MonoBehaviour
     private void Start ()
     {
         Physics.IgnoreLayerCollision(entityLayerIndex, entityLayerIndex, true);
+        Network.Connect();
         //for debug only
         //PostLoadReconstruction(default(Scene), LoadSceneMode.Additive);
     }
 	private void Update ()
     {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Network.Connect();
-        }
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            NetworkMessageResolve.NetworkLoginRequest("a", "b");
-        }
         /*if(Input.GetKeyDown(KeyCode.P))
         {
             if (debugBool)
@@ -98,8 +104,9 @@ public class Game : MonoBehaviour
         }
     }
     //called before loading of new map
-    private void PreLoadReconstruction(Scene current, Scene next)
+    private void PreLoadReconstruction()
     {
+        Debug.Log("pre");
         if(localMap != null)
         {
             GameObject.DestroyImmediate(localMap);
@@ -109,6 +116,7 @@ public class Game : MonoBehaviour
     //called after loading of new map
     private void PostLoadReconstruction(Scene scene, LoadSceneMode mode)
     {
+        Debug.Log("post");
         if (localPlayer == null)
             localPlayer = gameObject.AddComponent<Player>();
 

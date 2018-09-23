@@ -10,6 +10,8 @@ public class NetworkMessage
     {
         client_loginRequest,
         server_loginAnswer,
+        server_characterLoginInfo,
+        client_requestJoinToWorld,
         server_requestMapLoading,
 
         obstacle_mapRequested,
@@ -24,6 +26,14 @@ public class NetworkMessage
         client_positionUpdate,
     }
 
+    public enum LoginType
+    {
+        correct,
+        invalid,
+        gameVersion,
+        banned,
+    }
+
     public Type type;
     public NetDataWriter data = new NetDataWriter();
 
@@ -32,10 +42,7 @@ public class NetworkMessage
         Debug.Assert(Game.GetPlayer() != null, "Trying to send message without player initialized!");
 
         NetDataWriter netData = new NetDataWriter();
-        int playerId = Game.GetPlayer().GetPlayerId();
-
         netData.Put((byte)type);
-        netData.Put(playerId);
         netData.Put(data.Data);
         Network.SendMessage(netData, sendOptions);
     }

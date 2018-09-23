@@ -17,9 +17,11 @@ public class Network : MonoBehaviour
     {
         for (int i = 0; i < instance.messageWaitingList.Count; i++)
         {
-            NetworkMessage.Type messageType = (NetworkMessage.Type)instance.messageWaitingList[i].GetByte();
-            Game.AddThreadAction(() => NetworkMessageResolve.Resolve(messageType, instance.messageWaitingList[i]));
+            NetDataReader tempReader = instance.messageWaitingList[i];
+            NetworkMessage.Type messageType = (NetworkMessage.Type)tempReader.GetByte();
+            Game.AddThreadAction(() => NetworkMessageResolve.Resolve(messageType, tempReader));
         }
+        instance.messageWaitingList.Clear();
     }
     public static void OnCreatedEntity(Entity entity)
     {
@@ -28,9 +30,7 @@ public class Network : MonoBehaviour
 
         for (int i = 0; i < instance.entityMessageWaitingList[entity.GetId()].Count; i++)
         {
-            NetDataReader data = new NetDataReader();
-            data.SetSource(instance.entityMessageWaitingList[entity.GetId()][i].Data);
-
+            NetDataReader data = instance.entityMessageWaitingList[entity.GetId()][i];
             NetworkMessage.Type messageType = (NetworkMessage.Type)data.GetByte();
             Game.AddThreadAction(() => NetworkMessageResolve.Resolve(messageType, data));
         }
@@ -71,8 +71,8 @@ public class Network : MonoBehaviour
         instance.networkThread.Interrupt();
         instance.networkThread = null;
 
-        instance.OnDisconnect();
         Debug.Log("disconnecting...");
+        Game.AddThreadAction(() => LoginScreen.ShowInfo("disconnected"));
     }
     #endregion
 
