@@ -52,6 +52,11 @@ public class Game : MonoBehaviour
     {
         return instance.gameVersion;
     }
+    public static Transform InstantiateResource(string path)
+    {
+        GameObject obje = (GameObject)Resources.Load(path);
+        return Instantiate(obje.transform);
+    }
     #endregion
 
     #region private
@@ -74,21 +79,9 @@ public class Game : MonoBehaviour
     {
         Physics.IgnoreLayerCollision(entityLayerIndex, entityLayerIndex, true);
         Network.Connect();
-        //for debug only
-        //PostLoadReconstruction(default(Scene), LoadSceneMode.Additive);
     }
 	private void Update ()
     {
-        /*if(Input.GetKeyDown(KeyCode.P))
-        {
-            if (debugBool)
-                localPlayer.ControllableEntity = debugAttachableEntity;
-            else
-                localPlayer.ControllableEntity = debugAttachableEntity2;
-
-            debugBool = !debugBool;
-        }*/
-
         if (mainThreadActionList.Count > 0)
         {
             List<Action> localTempActions;
@@ -106,7 +99,6 @@ public class Game : MonoBehaviour
     //called before loading of new map
     private void PreLoadReconstruction()
     {
-        Debug.Log("pre");
         if(localMap != null)
         {
             GameObject.DestroyImmediate(localMap);
@@ -116,7 +108,6 @@ public class Game : MonoBehaviour
     //called after loading of new map
     private void PostLoadReconstruction(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log("post");
         if (localPlayer == null)
             localPlayer = gameObject.AddComponent<Player>();
 

@@ -21,11 +21,22 @@ public class Entity : MonoBehaviour
     }
     public void SetPostStartAction(Action postStartAction)
     {
-        this.postStartAction = postStartAction;
+        if (this.postStartAction == null)
+        {
+            this.postStartAction = postStartAction;
+        }
+        else
+        {
+            this.postStartAction += postStartAction;
+        }
     }
     public void DisableMovement(bool disable)
     {
         disableMovement = disable;
+    }
+    public void OnVisualChanged()
+    {
+        GetAnimationModule().OnVisualChanged();
     }
 
     public EntityAnimation GetAnimationModule()
@@ -56,15 +67,19 @@ public class Entity : MonoBehaviour
     {
         return id;
     }
+    public Vector3 GetLastFramePosition()
+    {
+        return lastFramePosition;
+    }
     #endregion
 
 
     #region protected
     protected virtual void Awake()
     {
-        
+
     }
-    protected virtual void Start ()
+    protected virtual void Start()
     {
         infoModule = GetComponent<EntityInfo>();
 
@@ -80,8 +95,10 @@ public class Entity : MonoBehaviour
         if (postStartAction != null)
             postStartAction();
     }
-	protected virtual void Update ()
+    protected virtual void Update()
     {
+        GetMovementModule().OnUpdate();
+
         if (!disableMovement)
         {
             GetMovementModule().CalculateMovement();
@@ -91,11 +108,20 @@ public class Entity : MonoBehaviour
     }
     protected virtual void LateUpdate()
     {
-
+        lastFramePosition = transform.position;
     }
     protected virtual void FixedUpdate()
     {
-        
+        if (Game.GetPlayer().ControllableEntity == this)
+        {
+            EntityMovement.MovementSnapshot snapshot = new EntityMovement.MovementSnapshot();
+            snapshot.id = GetId();
+            snapshot.inputs = GetMovementModule().GetInputs();
+            snapshot.position = transform.position;
+            snapshot.rotation = transform.eulerAngles.y;
+            snapshot.time = Network.GetServerTime();
+            NetworkMessageResolve.NetworkMovementSnapshotRequest(snapshot);
+        } 
     }
     #endregion
 
@@ -109,5 +135,6 @@ public class Entity : MonoBehaviour
     private int id;
     private Action postStartAction = null;
     private bool disableMovement;
+    private Vector3 lastFramePosition;
     #endregion
 }

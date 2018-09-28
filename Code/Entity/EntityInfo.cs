@@ -9,5 +9,8 @@ public class EntityInfo : MonoBehaviour
     {
         3.5f,
         7f,
+        10f,
+        3f
     };
+    public float waterSwimHeight = 1;
 }

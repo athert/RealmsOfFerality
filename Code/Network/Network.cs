@@ -10,6 +10,9 @@ public class Network : MonoBehaviour
     #region public
     public static void SendMessage(NetDataWriter data, SendOptions option)
     {
+        if (instance.serverNetPeer == null)
+            return;
+
         instance.serverNetPeer.Send(data, option);
     }
     //call in fader after map loading
@@ -74,6 +77,14 @@ public class Network : MonoBehaviour
         Debug.Log("disconnecting...");
         Game.AddThreadAction(() => LoginScreen.ShowInfo("disconnected"));
     }
+    public static void SetServerTime(int serverTime)
+    {
+        instance.serverTime = serverTime;
+    }
+    public static int GetServerTime()
+    {
+        return instance.serverTime;
+    }
     #endregion
 
     #region private
@@ -81,6 +92,7 @@ public class Network : MonoBehaviour
     private NetManager serverConnection;
     private NetPeer serverNetPeer;
     private Thread networkThread;
+    private int serverTime;
     private List<NetDataReader> messageWaitingList = new List<NetDataReader>();
     private Dictionary<int, List<NetDataReader>> entityMessageWaitingList = new Dictionary<int, List<NetDataReader>>();
 

@@ -2,15 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour {
+public class NetworkItem
+{
+    public int id;
+    public int count;
 
-	// Use this for initialization
-	void Start () {
+    public NetworkItem(int id, int count)
+    {
+        this.id = id;
+        this.count = count;
+    }
+}
+
+public class Item : MonoBehaviour
+{
+	void Start ()
+    {
 		
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+	void Update ()
+    {
 		
 	}
 }
