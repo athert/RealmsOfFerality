@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Chat : MonoBehaviour
+public class ChatUI : MonoBehaviour
 {
     private class ChatBubble
     {
@@ -242,7 +242,7 @@ public class Chat : MonoBehaviour
         }
     }
 
-    private static Chat instance;
+    private static ChatUI instance;
     private readonly float chatBubbleMinimalReadTime = 3;
     private readonly float chatBubbleMaximalReadTime = 10;
     private readonly float charCharacterReadTime = 0.25f;

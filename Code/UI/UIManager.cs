@@ -6,25 +6,40 @@ public class UIManager : MonoBehaviour
 {
     public void Update()
     {
-        if (!Chat.IsReady() || !Inventory.IsReady())
+        if (!ChatUI.IsReady() || !InventoryUI.IsReady())
             return;
 
         if (Input.GetKeyDown(KeyCode.I) && CanShowInventory())
         {
-            ShowInventory(!Inventory.IsInventoryVisible());
+            ShowInventory(!InventoryUI.IsInventoryVisible());
+        }
+
+        if (Input.GetKeyDown(KeyCode.G) && CanShowGuild())
+        {
+            ShowGuild(!GuildUI.IsGuildVisible());
         }
     }
 
     public bool CanShowInventory()
     {
-        return !Chat.IsChatFocused();
+        return !ChatUI.IsChatFocused();
+    }
+
+    public bool CanShowGuild()
+    {
+        return !ChatUI.IsChatFocused() && !InventoryUI.IsInventoryVisible();
     }
 
     private void ShowInventory(bool show)
     {
-        Inventory.ShowInventory(show);
-        Chat.HideChat(show);
+        InventoryUI.ShowInventory(show);
+        ChatUI.HideChat(show);
         UnityEngine.PostProcessing.PostProcessingProfile profile = PlayerCamera.instance.GetComponent<UnityEngine.PostProcessing.PostProcessingBehaviour>().profile;
         profile.depthOfField.enabled = show;
+    }
+
+    private void ShowGuild(bool show)
+    {
+        GuildUI.ShowGuild(show);
     }
 }

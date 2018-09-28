@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LoginScreen : MonoBehaviour
+public class LoginScreenUI : MonoBehaviour
 {
     #region public
     public Transform loginPageHolder;
@@ -284,7 +284,7 @@ public class LoginScreen : MonoBehaviour
     #endregion
 
     #region private
-    private static LoginScreen instance;
+    private static LoginScreenUI instance;
     private int characterSelectionWaitingCount;
     private int currentCharacterSelected = -1;
     private bool freezeModelRequest = false;

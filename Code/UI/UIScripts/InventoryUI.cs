@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Inventory : MonoBehaviour
+public class InventoryUI : MonoBehaviour
 {
     #region public
     public Transform inventoryHolder;
@@ -60,7 +60,7 @@ public class Inventory : MonoBehaviour
     #endregion
 
     #region private
-    private static Inventory instance;
+    private static InventoryUI instance;
     private bool isInventoryVisible = false;
     private Transform modelToShow;
     private Vector3 previousMousePosition;

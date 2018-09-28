@@ -75,7 +75,7 @@ public class Network : MonoBehaviour
         instance.networkThread = null;
 
         Debug.Log("disconnecting...");
-        Game.AddThreadAction(() => LoginScreen.ShowInfo("disconnected"));
+        Game.AddThreadAction(() => LoginScreenUI.ShowInfo("disconnected"));
     }
     public static void SetServerTime(int serverTime)
     {

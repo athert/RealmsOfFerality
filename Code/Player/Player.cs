@@ -5,9 +5,61 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     #region public
+    public class GuildInfo
+    {
+        public class Rank
+        {
+            public int id;
+            public string name;
+            public bool isMain;
+            public bool isBasic;
+            public bool canMemberInvite;
+            public bool canMemberRemove;
+            public bool canRankCreateRemove;
+            public bool canChangeInfo;
+            public bool canChangeAnnouncement;
+        }
+        public class Member
+        {
+            public int id;
+            public string name;
+            public string zone;
+            public Rank rank;
+            public bool isOnline;
+        }
+        public enum TimeInfo
+        {
+            members,
+            info,
+            announcement,
+            ranks,
+            name,
+            max,
+        }
+
+        //time info
+        public int[] timeInfo = new int[(int)TimeInfo.max];
+        //info
+        public int id = -1;
+        public string name = "";
+        public string info = "";
+        public string announcement = "";
+        public string owner = "";
+        public List<Rank> ranks = new List<Rank>();
+        public List<Member> members = new List<Member>();
+
+        public GuildInfo()
+        {
+            for (int i = 0; i < timeInfo.Length; i++)
+            {
+                timeInfo[i] = -1;
+            }
+        }
+    }
+
     public void SetPlayerId(int id)
     {
-
+        playerId = id;
     }
     public void SetFreezeInput(string reason, bool set)
     {
@@ -35,7 +87,7 @@ public class Player : MonoBehaviour
         if (networkItemList[index].count == 0)
             networkItemList.RemoveAt(index);
 
-        Inventory.RefreshInventory();
+        InventoryUI.RefreshInventory();
     }
 
     public Entity ControllableEntity
@@ -59,6 +111,10 @@ public class Player : MonoBehaviour
     {
         return networkItemList;
     }
+    public GuildInfo GetGuildInfo()
+    {
+        return playerGuildInfo;
+    }
     #endregion
 
     #region private
@@ -66,6 +122,7 @@ public class Player : MonoBehaviour
     private int playerId = -1;
     private List<string> inputFreezeList = new List<string>();
     private List<NetworkItem> networkItemList = new List<NetworkItem>();
+    private GuildInfo playerGuildInfo = new GuildInfo();
 
     private void Start ()
     {

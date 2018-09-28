@@ -30,6 +30,21 @@ public class NetworkMessage
         client_chatMessage,
         server_entityTeleport,
         server_inventoryItem,
+
+        client_guildInfoRequest,
+        server_guildInfo,
+        server_setGuild,
+        client_guildRankCreateRequest,
+        client_guildRankRemoveRequest,
+        client_guildMemberInviteRequest,
+        client_guildMemberRemoveRequest,
+        client_guildMemberRankChangeRequest,
+        client_guildAnnouncementChange,
+        client_guildInfoChange,
+        client_guildCreateRequest,
+        client_guildListRequest,
+        client_guildApplicationInviteRequest,
+        server_guildListInfo,
     }
 
     public enum LoginType

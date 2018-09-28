@@ -106,6 +106,10 @@ public class Database : MonoBehaviour
     {
         return instance.dbItemList;
     }
+    public static int[] GetGuildTimes(int guildId)
+    {
+        return Game.GetPlayer().GetGuildInfo().timeInfo;
+    }
 
     //specific
     public static List<db_character_submodel> GetDBCharacterSubModelBySpecific(db_character_model model, db_character_submodel.Type type)
